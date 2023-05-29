@@ -16,15 +16,8 @@
           </el-menu-item>
         </RouterLink>
 
-        <RouterLink to="/settings">
-          <el-menu-item index="3">
-            <el-icon><Setting /></el-icon>
-            <template #title>Settings</template>
-          </el-menu-item>
-        </RouterLink>
-
         <RouterLink to="/mission">
-          <el-menu-item index="4">
+          <el-menu-item index="3">
             <el-icon><Setting /></el-icon>
             <template #title>Mission</template>
           </el-menu-item>

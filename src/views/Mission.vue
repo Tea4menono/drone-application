@@ -1,77 +1,172 @@
 <template>
-  <div class="about">
-    <el-button @click="createMisson">Create New Mission</el-button>
+  <el-row>
+    <el-col :span="6">
+      <el-statistic title="Current Latitude" :value="current.latitude" />
+    </el-col>
 
-    <el-form label-width="100px" :model="position1" style="max-width: 460px">
-      <el-form-item label="latitude">
-        <el-input v-model="position1.latitude" />
-      </el-form-item>
-      <el-form-item label="longitude">
-        <el-input v-model="position1.longitude" />
-      </el-form-item>
-      <el-form-item label="altitude">
-        <el-input v-model="position1.altitude" />
-      </el-form-item>
-    </el-form>
+    <el-col :span="6">
+      <el-statistic title="Current Longitude" :value="current.longitude" />
+    </el-col>
 
-    <el-form label-width="100px" :model="position2" style="max-width: 460px">
-      <el-form-item label="latitude">
-        <el-input v-model="position2.latitude" />
-      </el-form-item>
-      <el-form-item label="longitude">
-        <el-input v-model="position2.longitude" />
-      </el-form-item>
-      <el-form-item label="altitude ">
-        <el-input v-model="position2.altitude" />
-      </el-form-item>
-    </el-form>
+    <el-col :span="6">
+      <el-statistic title="Current Altitude" :value="current.altitude" />
+    </el-col>
 
-    <el-button @click="test">Upload Mission</el-button>
-  </div>
+    <el-col :span="6">
+      <el-statistic title="Last Update" :value="timestamp" />
+    </el-col>
+  </el-row>
+
+  <el-form
+    ref="formRef"
+    :model="form"
+    label-width="120px"
+    class="demo-dynamic"
+    label-position="top"
+  >
+    <template v-for="(position, index) in form.positions" :key="position.key">
+      <el-form-item
+        style="width: 300px"
+        :label="'Position' + (index + 1) + ' latitude'"
+        :prop="'positions.' + index + '.latitude'"
+        :rules="{
+          required: true,
+          message: 'latitude can not be null',
+          trigger: 'blur',
+        }"
+      >
+        <el-input v-model="position.latitude"> </el-input>
+      </el-form-item>
+
+      <el-form-item
+        style="width: 300px"
+        :label="'Position' + (index + 1) + ' longitude'"
+        :prop="'positions.' + index + '.longitude'"
+        :rules="{
+          required: true,
+          message: 'longitude can not be null',
+          trigger: 'blur',
+        }"
+      >
+        <el-input v-model="position.longitude"> </el-input>
+      </el-form-item>
+
+      <el-form-item
+        style="width: 300px"
+        :label="'Position' + (index + 1) + ' altitude'"
+        :prop="'positions.' + index + '.altitude'"
+        :rules="{
+          required: true,
+          message: 'altitude can not be null',
+          trigger: 'blur',
+        }"
+      >
+        <el-input v-model="position.altitude"> </el-input>
+      </el-form-item>
+      <el-form-item>
+        <el-button
+          v-if="index > 0"
+          class="mt-2"
+          @click.prevent="removePosition(position)"
+          >Delete Position {{ index + 1 }}</el-button
+        >
+      </el-form-item>
+    </template>
+
+    <el-form-item>
+      <el-button type="primary" @click="submitForm(formRef)"
+        >Preview Mission Route</el-button
+      >
+      <el-button @click="addPosition">New domain</el-button>
+      <el-button @click="resetForm(formRef)">Reset</el-button>
+    </el-form-item>
+  </el-form>
 </template>
-<script setup>
-import { reactive } from "vue";
 
+<script lang="ts" setup>
+import { reactive, ref } from "vue";
+import type { FormInstance } from "element-plus";
+import { onMounted } from "vue";
 import axios from "axios";
-
-const position1 = reactive({
-  latitude: 51.0866776,
-  longitude: -114.0595247,
-  altitude: 30,
+const formRef = ref<FormInstance>();
+const form = reactive<{
+  positions: PositionItem[];
+}>({
+  positions: [
+    {
+      key: 1,
+      latitude: "",
+      longitude: "",
+      altitude: "",
+    },
+  ],
 });
 
-const position2 = reactive({
-  latitude: 51.0876776,
-  longitude: -114.0595247,
-  altitude: 30,
+const current: PositionItem = reactive({
+  key: 0,
+  latitude: "",
+  longitude: "",
+  altitude: "",
 });
 
-const createMisson = () => {};
+const timestamp = ref("");
 
-const test = async () => {
-  const response = await axios.post("http://3.139.94.118:8080/send-command", {
-    command: [
-      {
-        lat: 51.0866776,
-        lon: -114.0595247,
-        alt: 10,
-      },
-      {
-        lat: 51.0876776,
-        lon: -114.0595247,
-        alt: 10,
-      },
-    ],
+interface PositionItem {
+  key: number;
+  latitude: string;
+  longitude: string;
+  altitude: string;
+}
+
+const removePosition = (item: PositionItem) => {
+  const index = form.positions.indexOf(item);
+  if (index !== -1) {
+    form.positions.splice(index, 1);
+  }
+};
+
+const addPosition = () => {
+  form.positions.push({
+    key: Date.now(),
+    latitude: "",
+    longitude: "",
+    altitude: "",
   });
 };
+
+const submitForm = (formEl: FormInstance | undefined) => {
+  if (!formEl) return;
+  formEl.validate((valid) => {
+    if (valid) {
+      console.log("submit!");
+    } else {
+      console.log("error submit!");
+      return false;
+    }
+  });
+};
+
+const resetForm = (formEl: FormInstance | undefined) => {
+  if (!formEl) return;
+  formEl.resetFields();
+};
+
+const updatePosition = async () => {
+  let res = await axios.get("http://localhost:8080/get-current-position");
+
+  current.latitude = res.data[0].latitude;
+  current.longitude = res.data[0].longitude;
+  current.altitude = res.data[0].altitude;
+  timestamp.value = res.data[0].timestamp;
+};
+onMounted(() => {
+  updatePosition();
+  // setInterval(updatePosition, 1000);
+});
 </script>
 
-<style>
-@media (min-width: 1024px) {
-  .about {
-    min-height: 100vh;
-    display: flex;
-    /* align-items: center; */
-  }
+<style scoped>
+.el-col {
+  text-align: center;
 }
 </style>
