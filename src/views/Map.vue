@@ -8,8 +8,7 @@
 </template>
 
 <script setup>
-import { onMounted, reactive, watch } from "vue";
-import axios from "axios";
+import { onMounted, reactive } from "vue";
 const location = reactive({ lat: 0, lng: 0 });
 
 const paths = reactive([

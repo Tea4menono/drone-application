@@ -1,5 +1,7 @@
 <template>
   <div class="about">
+    <el-button @click="createMisson">Create New Mission</el-button>
+
     <el-form label-width="100px" :model="position1" style="max-width: 460px">
       <el-form-item label="latitude">
         <el-input v-model="position1.latitude" />
@@ -44,6 +46,8 @@ const position2 = reactive({
   altitude: 30,
 });
 
+const createMisson = () => {};
+
 const test = async () => {
   const response = await axios.post("http://3.139.94.118:8080/send-command", {
     command: [
@@ -59,7 +63,6 @@ const test = async () => {
       },
     ],
   });
-  console.log(response.data);
 };
 </script>
 
@@ -68,7 +71,7 @@ const test = async () => {
   .about {
     min-height: 100vh;
     display: flex;
-    align-items: center;
+    /* align-items: center; */
   }
 }
 </style>
