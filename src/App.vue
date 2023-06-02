@@ -9,19 +9,12 @@
           </el-menu-item>
         </RouterLink>
 
-        <RouterLink to="/map">
+        <!-- <RouterLink to="/mission">
           <el-menu-item index="2">
-            <el-icon><MapLocation /></el-icon>
-            <template #title>Map</template>
-          </el-menu-item>
-        </RouterLink>
-
-        <RouterLink to="/mission">
-          <el-menu-item index="3">
             <el-icon><Setting /></el-icon>
             <template #title>Mission</template>
           </el-menu-item>
-        </RouterLink>
+        </RouterLink> -->
       </el-menu>
     </div>
 
@@ -34,7 +27,7 @@
 <script lang="ts" setup>
 import { RouterLink, RouterView } from "vue-router";
 
-import { Menu, Setting, MapLocation } from "@element-plus/icons-vue";
+import { Menu, Setting } from "@element-plus/icons-vue";
 </script>
 
 <style scoped>

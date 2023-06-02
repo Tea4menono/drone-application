@@ -89,7 +89,7 @@
     align-center
   >
     <GMapMap :center="location" :zoom="18" style="width: 100%; height: 500px">
-      <GMapMarker :position="location" :clickable="true" />
+      <GMapMarker :position="location" :clickable="true"> </GMapMarker>
       <GMapPolygon :paths="paths" />
     </GMapMap>
     <el-button @click="uploadMission" type="primary"
