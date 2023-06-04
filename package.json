@@ -9,17 +9,16 @@
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.1.0",
-    "@fawmi/vue-google-maps": "^0.9.79",
     "@googlemaps/js-api-loader": "^1.15.2",
     "axios": "^1.4.0",
     "element-plus": "^2.3.4",
-    "http-server": "^14.1.1",
     "pinia": "^2.0.36",
     "vue": "^3.3.2",
     "vue-router": "^4.2.0"
   },
   "devDependencies": {
     "@types/googlemaps": "^3.43.3",
+    "@types/node": "^20.2.5",
     "@vitejs/plugin-vue": "^4.2.3",
     "vite": "^4.3.5"
   }

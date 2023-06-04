@@ -8,13 +8,6 @@
             <template #title>Dashboard</template>
           </el-menu-item>
         </RouterLink>
-
-        <!-- <RouterLink to="/mission">
-          <el-menu-item index="2">
-            <el-icon><Setting /></el-icon>
-            <template #title>Mission</template>
-          </el-menu-item>
-        </RouterLink> -->
       </el-menu>
     </div>
 

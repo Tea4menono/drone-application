@@ -6,7 +6,7 @@ import vue from "@vitejs/plugin-vue";
 export default defineConfig({
   plugins: [vue()],
   optimizeDeps: {
-    include: ["@fawmi/vue-google-maps", "fast-deep-equal"],
+    include: ["fast-deep-equal"],
   },
   resolve: {
     alias: {

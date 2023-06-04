@@ -75,7 +75,7 @@ import { ElMessage } from "element-plus";
 import { Loader } from "@googlemaps/js-api-loader";
 
 const loader = new Loader({
-  apiKey: "AIzaSyAHwMr9YvYZDxSrn1FR3zO4e4RRI5nHd4g",
+  apiKey: import.meta.env.VITE_APP_GOOGLE_MAPS_API_KEY,
   version: "weekly",
 });
 const editingStatus = ref(false);
