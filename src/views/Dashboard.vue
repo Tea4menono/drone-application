@@ -8,8 +8,9 @@
     border
   >
     <template #extra>
-      <el-button type="primary" @click="startMission">Start</el-button>
-      <el-button type="primary" @click="endMission">End</el-button>
+      <el-button type="primary" @click="startMission"
+        >Start Route Planning</el-button
+      >
       <el-button type="primary" @click="previewMission">Preview</el-button>
       <el-button type="primary" @click="uploadMission">Upload</el-button>
     </template>
@@ -42,11 +43,6 @@
     v-for="(x, index) in positionsList"
     :key="index"
   >
-    <template #extra>
-      <el-button type="primary" @click="removePosition(index)"
-        >Remove</el-button
-      >
-    </template>
     <el-descriptions-item>
       <template #label>
         <div class="cell-item">Latitude</div>
@@ -69,9 +65,8 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref } from "vue";
+import { reactive, ref, onBeforeUnmount, onMounted } from "vue";
 import axios from "axios";
-import { ElMessage } from "element-plus";
 import { Loader } from "@googlemaps/js-api-loader";
 
 const loader = new Loader({
@@ -85,39 +80,16 @@ interface Position {
   lng: number;
   alt: number;
 }
+const labels = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+let labelIndex = 0;
+let locationUpdater;
 let map;
+let marker;
 
 const home = reactive({ lat: 0, lng: 0, alt: 0 });
-loader.load().then(async () => {
-  const { Map } = (await google.maps.importLibrary(
-    "maps"
-  )) as google.maps.MapsLibrary;
-  let res = await axios.get("http://3.139.94.118:8080/get-current-position");
-  home.lat = Number(res.data.lat);
-  home.lng = Number(res.data.lon);
-  home.alt = Number(res.data.alt);
-  map = new Map(document.getElementById("map") as HTMLElement, {
-    center: home,
-    zoom: 16,
-  });
-  map.addListener("click", (e) => {
-    getLocation(e.latLng, map);
-  });
-
-  new google.maps.Marker({
-    position: home,
-    map: map,
-  });
-  map.panTo(home);
-});
 
 const startMission = () => {
-  ElMessage("Click the map to set positions.");
   editingStatus.value = true;
-};
-
-const removePosition = (index: number) => {
-  positionsList.splice(index, 1);
 };
 
 const previewMission = () => {
@@ -133,17 +105,39 @@ const previewMission = () => {
       },
     ],
     strokeColor: "#FF0000",
-
     map: map,
   });
 };
 
-const endMission = () => {};
+const uploadMission = async () => {
+  await axios.post("http://3.139.94.118:8080/send-command", {
+    command: positionsList,
+  });
+};
 
-const uploadMission = () => {};
+const updateLocation = () => {
+  locationUpdater = setInterval(async () => {
+    let res = await axios.get("http://3.139.94.118:8080/get-current-position");
+    home.lat = Number(res.data.lat);
+    home.lng = Number(res.data.lon);
+    home.alt = Number(res.data.alt);
+    marker.setMap(null);
 
-const getLocation = (latLng, map) => {
+    marker = new google.maps.Marker({
+      position: home,
+      map: map,
+    });
+  }, 1000);
+};
+
+const setRoutePoint = (latLng, map) => {
   if (editingStatus.value) {
+    new google.maps.Marker({
+      position: latLng,
+      label: labels[labelIndex++ % labels.length],
+      map: map,
+    });
+
     positionsList.push({
       lat: latLng.lat(),
       lng: latLng.lng(),
@@ -151,6 +145,39 @@ const getLocation = (latLng, map) => {
     });
   }
 };
+
+onMounted(() => {
+  loader.load().then(async () => {
+    const { Map } = (await google.maps.importLibrary(
+      "maps"
+    )) as google.maps.MapsLibrary;
+
+    let res = await axios.get("http://3.139.94.118:8080/get-current-position");
+    home.lat = Number(res.data.lat);
+    home.lng = Number(res.data.lon);
+    home.alt = Number(res.data.alt);
+    map = new Map(document.getElementById("map") as HTMLElement, {
+      center: home,
+      zoom: 16,
+    });
+    map.addListener("click", (e) => {
+      setRoutePoint(e.latLng, map);
+    });
+
+    marker = new google.maps.Marker({
+      position: home,
+      map: map,
+    });
+
+    map.panTo(home);
+
+    updateLocation();
+  });
+});
+
+onBeforeUnmount(() => {
+  clearInterval(locationUpdater);
+});
 </script>
 
 <style>
