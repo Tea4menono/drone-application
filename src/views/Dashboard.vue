@@ -141,7 +141,7 @@ const setRoutePoint = (latLng, map) => {
     positionsList.push({
       lat: latLng.lat(),
       lng: latLng.lng(),
-      alt: 20,
+      alt: 10,
     });
   }
 };
