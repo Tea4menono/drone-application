@@ -9,6 +9,14 @@
           </el-menu-item>
         </RouterLink>
       </el-menu>
+      <el-menu class="el-menu-vertical-demo">
+        <RouterLink to="/log">
+          <el-menu-item index="2">
+            <el-icon><Setting /></el-icon>
+            <template #title>Log</template>
+          </el-menu-item>
+        </RouterLink>
+      </el-menu>
     </div>
 
     <div class="content">
