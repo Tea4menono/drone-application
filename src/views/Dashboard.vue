@@ -1,5 +1,17 @@
 <template>
   <div id="map"></div>
+
+  <el-steps :active="active" finish-status="success">
+    <el-step title="Status Check" />
+    <el-step title="Take Off" />
+    <el-step title="Armed" />
+    <el-step title="Position 1" />
+    <el-step title="Position 2" />
+    <el-step title="Position 3" />
+    <el-step title="Land" />
+    <el-step title="Disarmed" />
+  </el-steps>
+
   <el-descriptions
     class="margin-top"
     title="Current UAV Position"
@@ -13,7 +25,9 @@
       >
       <el-button type="primary" @click="previewMission">Preview</el-button>
       <el-button type="primary" @click="uploadMission">Upload</el-button>
+      <el-button type="warning" @click="uploadMission">Land and Stop</el-button>
     </template>
+
     <el-descriptions-item>
       <template #label>
         <div class="cell-item">Latitude</div>
@@ -85,6 +99,7 @@ let labelIndex = 0;
 let locationUpdater;
 let map;
 let marker;
+const active = ref(0);
 
 const home = reactive({ lat: 0, lng: 0, alt: 0 });
 
